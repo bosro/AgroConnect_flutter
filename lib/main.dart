@@ -11,7 +11,12 @@ import 'utils/app_colors.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // await FirebaseService.addSampleData();
+
+  await FarmerFriendsData.addSampleData();
+
+  // Initialize notifications
+  await NotificationService.initialize();
+
   runApp(MyApp());
 }
 
@@ -25,7 +30,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductProvider()),
       ],
       child: MaterialApp(
-        title: 'AgroConnect',
+        title: 'Farmer Friends',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,

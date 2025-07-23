@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'AgroConnect',
+                  'Farmer Friends',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -86,8 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 8),
-                Text(
-                  'Your Agricultural Marketplace',
+               Text(
+                  'Your Agricultural Partner in Madina',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white.withOpacity(0.8),

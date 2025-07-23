@@ -15,46 +15,61 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _user != null;
 
   Future<bool> signUp({
-    required String email,
-    required String password,
-    required String name,
-    required String phone,
-  }) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
+  required String email,
+  required String password,
+  required String name,
+  required String phone,
+}) async {
+  try {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
 
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
+    // Validate input
+    if (!_isValidEmail(email)) {
+      throw Exception('Please enter a valid email address');
+    }
+    
+    if (password.length < 6) {
+      throw Exception('Password must be at least 6 characters');
+    }
+
+    UserCredential result = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    if (result.user != null) {
+      UserModel newUser = UserModel(
+        id: result.user!.uid,
         email: email,
-        password: password,
+        name: name,
+        phone: phone,
+        createdAt: DateTime.now(),
       );
 
-      if (result.user != null) {
-        UserModel newUser = UserModel(
-          id: result.user!.uid,
-          email: email,
-          name: name,
-          phone: phone,
-          createdAt: DateTime.now(),
-        );
+      await _firestore
+          .collection('users')
+          .doc(result.user!.uid)
+          .set(newUser.toMap());
 
-        await _firestore
-            .collection('users')
-            .doc(result.user!.uid)
-            .set(newUser.toMap());
-
-        _user = newUser;
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      }
-    } catch (e) {
+      _user = newUser;
       _isLoading = false;
       notifyListeners();
-      print('SignUp Error: $e');
+      return true;
     }
-    return false;
+  } catch (e) {
+    _isLoading = false;
+    _errorMessage = e.toString();
+    notifyListeners();
+    print('SignUp Error: $e');
   }
+  return false;
+}
+
+bool _isValidEmail(String email) {
+  return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+}
 
   Future<bool> signIn({
     required String email,

@@ -17,14 +17,41 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+
+ class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, dynamic>> _categories = [
-    {'name': 'Fruits', 'icon': Icons.apple, 'color': Colors.red},
-    {'name': 'Vegetables', 'icon': Icons.eco, 'color': Colors.green},
-    {'name': 'Grains', 'icon': Icons.grain, 'color': Colors.orange},
-    {'name': 'Livestock', 'icon': Icons.pets, 'color': Colors.brown},
-    {'name': 'Equipment', 'icon': Icons.agriculture, 'color': Colors.blue},
+    {
+      'name': 'Equipment', 
+      'icon': Icons.agriculture, 
+      'color': AppColors.secondary,
+      'description': 'Farming tools & machinery'
+    },
+    {
+      'name': 'Animal Feed', 
+      'icon': Icons.grass, 
+      'color': AppColors.accent,
+      'description': 'Quality feed for livestock'
+    },
+    {
+      'name': 'Poultry', 
+      'icon': Icons.egg, 
+      'color': AppColors.primary,
+      'description': 'Poultry supplies & products'
+    },
+    {
+      'name': 'Seeds', 
+      'icon': Icons.eco, 
+      'color': Colors.brown,
+      'description': 'High-quality seeds'
+    },
+    {
+      'name': 'Fertilizers', 
+      'icon': Icons.scatter_plot, 
+      'color': Colors.green[700]!,
+      'description': 'Organic & chemical fertilizers'
+    },
   ];
+
 
   final List<Map<String, dynamic>> _todayTasks = [
     {
@@ -142,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildWeatherSection() {
+ Widget _buildWeatherSection() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -151,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Consumer<AuthProvider>(
             builder: (context, auth, child) {
               return Text(
-                'Hi, ${auth.user?.name.split(' ').first ?? 'Farmer'}!',
+                'Welcome to Farmer Friends, ${auth.user?.name.split(' ').first ?? 'Farmer'}!',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -160,12 +187,21 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
+          SizedBox(height: 4),
+          Text(
+            'Your trusted partner in agriculture',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.8),
+              fontSize: 14,
+            ),
+          ),
           SizedBox(height: 8),
           WeatherCard(),
         ],
       ),
     );
   }
+}
 
   Widget _buildTasksSection() {
     return Container(
