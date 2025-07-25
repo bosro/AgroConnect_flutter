@@ -29,6 +29,22 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
+
+  <!-- Permissions -->
+    <key>NSCameraUsageDescription</key>
+    <string>This app needs camera access to upload product images</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app needs photo library access to select product images</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs location access to show nearby farmers</string>
+
+	<!-- App Transport Security -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <false/>
+    </dict>
+
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>

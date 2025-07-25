@@ -201,7 +201,7 @@ class HomeScreen extends StatefulWidget {
       ),
     );
   }
-}
+
 
   Widget _buildTasksSection() {
     return Container(

@@ -1,3 +1,5 @@
+import 'package:agroconnect/screens/admin/admin_login_screen.dart';
+import 'package:agroconnect/screens/feedback/feedback_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -244,101 +246,114 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildMenuItems(BuildContext context, AuthProvider auth) {
-    final menuItems = [
-      {'icon': Icons.receipt_long, 'title': 'My Orders', 'subtitle': 'View your order history'},
-      {'icon': Icons.favorite, 'title': 'Wishlist', 'subtitle': 'Your favorite products'},
-      {'icon': Icons.location_on, 'title': 'Addresses', 'subtitle': 'Manage delivery addresses'},
-      {'icon': Icons.payment, 'title': 'Payment Methods', 'subtitle': 'Manage payment options'},
-      {'icon': Icons.notifications, 'title': 'Notifications', 'subtitle': 'Notification preferences'},
-      {'icon': Icons.help, 'title': 'Help & Support', 'subtitle': 'Get help and support'},
-      {'icon': Icons.info, 'title': 'About', 'subtitle': 'About AgroConnect'},
-    ];
+  final menuItems = [
+    {'icon': Icons.receipt_long, 'title': 'My Orders', 'subtitle': 'View your order history'},
+    {'icon': Icons.favorite, 'title': 'Wishlist', 'subtitle': 'Your favorite products'},
+    {'icon': Icons.location_on, 'title': 'Addresses', 'subtitle': 'Manage delivery addresses'},
+    {'icon': Icons.payment, 'title': 'Payment Methods', 'subtitle': 'Manage payment options'},
+    {'icon': Icons.notifications, 'title': 'Notifications', 'subtitle': 'Notification preferences'},
+    {'icon': Icons.feedback, 'title': 'Send Feedback', 'subtitle': 'Help us improve the app'},
+    {'icon': Icons.help, 'title': 'Help & Support', 'subtitle': 'Get help and support'},
+    {'icon': Icons.info, 'title': 'About', 'subtitle': 'About Farmer Friends'},
+    // Add admin access
+    {'icon': Icons.admin_panel_settings, 'title': 'Admin Portal', 'subtitle': 'For authorized personnel only'},
+  ];
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
+  return Container(
+    margin: EdgeInsets.symmetric(horizontal: 16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.1),
+          blurRadius: 10,
+          offset: Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Column(
+      children: [
+        ...menuItems.map((item) => _buildMenuItem(
+          context,
+          item['icon'] as IconData,
+          item['title'] as String,
+          item['subtitle'] as String,
+        )).toList(),
+        Divider(height: 1),
+        _buildMenuItem(
+          context,
+          Icons.logout,
+          'Logout',
+          'Sign out of your account',
+          isLogout: true,
+          onTap: () => _showLogoutDialog(context, auth),
+        ),
+      ],
+    ),
+  );
+}
+
+ Widget _buildMenuItem(
+  BuildContext context,
+  IconData icon,
+  String title,
+  String subtitle, {
+  bool isLogout = false,
+  VoidCallback? onTap,
+}) {
+  return ListTile(
+    leading: Container(
+      padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
+        color: (isLogout ? AppColors.error : AppColors.primary).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        children: [
-          ...menuItems.map((item) => _buildMenuItem(
-            context,
-            item['icon'] as IconData,
-            item['title'] as String,
-            item['subtitle'] as String,
-          )).toList(),
-          Divider(height: 1),
-          _buildMenuItem(
-            context,
-            Icons.logout,
-            'Logout',
-            'Sign out of your account',
-            isLogout: true,
-            onTap: () => _showLogoutDialog(context, auth),
-          ),
-        ],
+      child: Icon(
+        icon,
+        color: isLogout ? AppColors.error : AppColors.primary,
+        size: 20,
       ),
-    );
-  }
-
-  Widget _buildMenuItem(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String subtitle, {
-    bool isLogout = false,
-    VoidCallback? onTap,
-  }) {
-    return ListTile(
-      leading: Container(
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: (isLogout ? AppColors.error : AppColors.primary).withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          color: isLogout ? AppColors.error : AppColors.primary,
-          size: 20,
-        ),
+    ),
+    title: Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: isLogout ? AppColors.error : AppColors.textPrimary,
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: isLogout ? AppColors.error : AppColors.textPrimary,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          fontSize: 12,
-          color: AppColors.textSecondary,
-        ),
-      ),
-      trailing: Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
+    ),
+    subtitle: Text(
+      subtitle,
+      style: TextStyle(
+        fontSize: 12,
         color: AppColors.textSecondary,
       ),
-      onTap: onTap ?? () {
-        // Handle navigation to different screens
-        if (title == 'My Orders') {
-          DefaultTabController.of(context)?.animateTo(3);
-        }
-        // Add other navigation logic here
-      },
-    );
-  }
+    ),
+    trailing: Icon(
+      Icons.arrow_forward_ios,
+      size: 16,
+      color: AppColors.textSecondary,
+    ),
+    onTap: onTap ?? () {
+      // Handle navigation to different screens
+      if (title == 'My Orders') {
+        DefaultTabController.of(context)?.animateTo(3);
+      } else if (title == 'Send Feedback') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => FeedbackScreen()),
+        );
+      } else if (title == 'Admin Portal') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AdminLoginScreen()),
+        );
+      }
+      // Add other navigation logic here
+    },
+  );
+}
 
   void _showLogoutDialog(BuildContext context, AuthProvider auth) {
     showDialog(

@@ -1,3 +1,7 @@
+import 'package:agroconnect/providers/admin_provider.dart';
+import 'package:agroconnect/providers/search_provider.dart';
+import 'package:agroconnect/services/farmer_friends_data.dart';
+import 'package:agroconnect/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +16,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  await FarmerFriendsData.addSampleData();
+  // await FarmerFriendsData.addSampleData();
 
   // Initialize notifications
   await NotificationService.initialize();
@@ -28,6 +32,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => SearchProvider()), // Add this if you created SearchProvider
+        ChangeNotifierProvider(create: (_) => AdminProvider()), // Add this
       ],
       child: MaterialApp(
         title: 'Farmer Friends',

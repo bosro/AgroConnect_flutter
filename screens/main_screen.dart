@@ -1,3 +1,4 @@
+import 'package:agroconnect/screens/cart/cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:badges/badges.dart' as badges;
@@ -6,7 +7,6 @@ import '../providers/product_provider.dart';
 import '../utils/app_colors.dart';
 import 'home/home_screen.dart';
 import 'products/products_screen.dart';
-import 'cart/cart_screen.dart';
 import 'orders/orders_screen.dart';
 import 'profile/profile_screen.dart';
 

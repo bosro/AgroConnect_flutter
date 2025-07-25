@@ -26,9 +26,14 @@ dependencies:
   uuid: ^4.2.1
   shimmer: ^3.0.0
   # carousel_slider: ^4.2.1
+  carousel_slider: ^5.1.1
   badges: ^3.1.2
   fluttertoast: ^8.2.4
   google_fonts: ^6.1.0
+  in_app_update: ^4.2.2
+  shared_preferences: ^2.5.3
+  connectivity_plus: ^6.1.4
+  hive: ^2.2.3
 
 dev_dependencies:
   flutter_test:

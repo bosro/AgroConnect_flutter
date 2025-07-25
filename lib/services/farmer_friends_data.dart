@@ -115,7 +115,7 @@ class FarmerFriendsData {
     ];
 
     for (var product in sampleProducts) {
-      await _firestore.collection('products').doc(product['id']).set(product);
+      await _firestore.collection('products').doc(product['id'] as String?).set(product);
     }
 
     print('Farmer Friends sample data added successfully!');

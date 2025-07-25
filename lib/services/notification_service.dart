@@ -120,30 +120,32 @@ class NotificationService {
   }
 
   // Send notification to specific user
-  static Future<void> sendNotificationToUser({
-    required String userId,
-    required String title,
-    required String body,
-    Map<String, dynamic>? data,
-  }) async {
-    try {
-      DocumentSnapshot userDoc = await _firestore
-          .collection('users')
-          .doc(userId)
-          .get();
+static Future<void> sendNotificationToUser({
+  required String userId,
+  required String title,
+  required String body,
+  Map<String, dynamic>? data,
+}) async {
+  try {
+    DocumentSnapshot userDoc = await _firestore
+        .collection('users')
+        .doc(userId)
+        .get();
+    
+    if (userDoc.exists && userDoc.data() != null) {
+      Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+      String? fcmToken = userData['fcmToken'] as String?;
       
-      if (userDoc.exists) {
-        String? fcmToken = userDoc.data() as Map<String, dynamic>?['fcmToken'];
-        if (fcmToken != null) {
-          // Here you would send the notification using your backend
-          // or Firebase Functions
-          print('Sending notification to token: $fcmToken');
-        }
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        // Here you would send the notification using your backend
+        // or Firebase Functions
+        print('Sending notification to token: $fcmToken');
       }
-    } catch (e) {
-      print('Error sending notification: $e');
     }
+  } catch (e) {
+    print('Error sending notification: $e');
   }
+}
 
   // Send order status update notification
   static Future<void> sendOrderStatusNotification({

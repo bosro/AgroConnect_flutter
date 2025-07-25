@@ -12,6 +12,9 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final int maxLines;
   final bool enabled;
+  final FocusNode? focusNode; // Add this
+  final Function(String)? onSubmitted; // Add this
+  final Function(String)? onChanged; // Add this for completeness
 
   const CustomTextField({
     Key? key,
@@ -25,17 +28,23 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.maxLines = 1,
     this.enabled = true,
+    this.focusNode, // Add this
+    this.onSubmitted, // Add this
+    this.onChanged, // Add this
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      focusNode: focusNode, // Add this
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
       maxLines: maxLines,
       enabled: enabled,
+      onFieldSubmitted: onSubmitted, // Add this (note: onFieldSubmitted for TextFormField)
+      onChanged: onChanged, // Add this
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,

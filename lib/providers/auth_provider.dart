@@ -27,30 +27,39 @@ class AuthProvider with ChangeNotifier {
       _errorMessage = null;
       notifyListeners();
 
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
+        if (!_isValidEmail(email)) {
+      throw Exception('Please enter a valid email address');
+    }
+    
+    if (password.length < 6) {
+      throw Exception('Password must be at least 6 characters');
+    }
+
+    UserCredential result = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+
+     if (result.user != null) {
+      UserModel newUser = UserModel(
+        id: result.user!.uid,
         email: email,
-        password: password,
+        name: name,
+        phone: phone,
+        createdAt: DateTime.now(),
       );
 
-      if (result.user != null) {
-        UserModel newUser = UserModel(
-          id: result.user!.uid,
-          email: email,
-          name: name,
-          phone: phone,
-          createdAt: DateTime.now(),
-        );
+      await _firestore
+          .collection('users')
+          .doc(result.user!.uid)
+          .set(newUser.toMap());
 
-        await _firestore
-            .collection('users')
-            .doc(result.user!.uid)
-            .set(newUser.toMap());
-
-        _user = newUser;
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      }
+      _user = newUser;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }
     } on FirebaseAuthException catch (e) {
       _isLoading = false;
       _errorMessage = e.message;
@@ -77,6 +86,10 @@ class AuthProvider with ChangeNotifier {
     }
     return false;
   }
+
+bool _isValidEmail(String email) {
+  return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+}
 
   Future<bool> signIn({
     required String email,
