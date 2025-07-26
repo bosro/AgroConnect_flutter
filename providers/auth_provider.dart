@@ -6,7 +6,7 @@ import '../models/user_model.dart';
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  
   UserModel? _user;
   bool _isLoading = false;
   String? _errorMessage;
@@ -27,51 +27,69 @@ class AuthProvider with ChangeNotifier {
       _errorMessage = null;
       notifyListeners();
 
-      // Validate input
-      if (!_isValidEmail(email)) {
-        throw Exception('Please enter a valid email address');
-      }
+        if (!_isValidEmail(email)) {
+      throw Exception('Please enter a valid email address');
+    }
+    
+    if (password.length < 6) {
+      throw Exception('Password must be at least 6 characters');
+    }
 
-      if (password.length < 6) {
-        throw Exception('Password must be at least 6 characters');
-      }
+    UserCredential result = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
 
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
+
+     if (result.user != null) {
+      UserModel newUser = UserModel(
+        id: result.user!.uid,
         email: email,
-        password: password,
+        name: name,
+        phone: phone,
+        createdAt: DateTime.now(),
       );
 
-      if (result.user != null) {
-        UserModel newUser = UserModel(
-          id: result.user!.uid,
-          email: email,
-          name: name,
-          phone: phone,
-          createdAt: DateTime.now(),
-        );
+      await _firestore
+          .collection('users')
+          .doc(result.user!.uid)
+          .set(newUser.toMap());
 
-        await _firestore
-            .collection('users')
-            .doc(result.user!.uid)
-            .set(newUser.toMap());
-
-        _user = newUser;
-        _isLoading = false;
-        notifyListeners();
+      _user = newUser;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      _errorMessage = e.message;
+      notifyListeners();
+      print('Firebase Auth Error: ${e.message}');
+      
+      // Handle the specific case where user was created but we got a plugin error
+      if (e.code == 'unknown' && _auth.currentUser != null) {
+        await _loadUserFromFirestore(_auth.currentUser!.uid);
         return true;
       }
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      _errorMessage = 'An unexpected error occurred';
       notifyListeners();
       print('SignUp Error: $e');
+      
+      // Check if user was actually created despite the error
+      await Future.delayed(Duration(milliseconds: 500));
+      if (_auth.currentUser != null) {
+        await _loadUserFromFirestore(_auth.currentUser!.uid);
+        return true;
+      }
     }
     return false;
   }
 
-  bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
+bool _isValidEmail(String email) {
+  return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+}
 
   Future<bool> signIn({
     required String email,
@@ -79,7 +97,7 @@ class AuthProvider with ChangeNotifier {
   }) async {
     try {
       _isLoading = true;
-      _errorMessage = null; // Clear previous errors
+      _errorMessage = null;
       notifyListeners();
 
       UserCredential result = await _auth.signInWithEmailAndPassword(
@@ -88,49 +106,59 @@ class AuthProvider with ChangeNotifier {
       );
 
       if (result.user != null) {
-        DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(result.user!.uid).get();
-
-        if (userDoc.exists) {
-          _user = UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
-        }
-
+        await _loadUserFromFirestore(result.user!.uid);
         _isLoading = false;
         notifyListeners();
         return true;
       }
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      _errorMessage = e.message;
+      notifyListeners();
+      print('Firebase Auth Error: ${e.message}');
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString(); // Set error message
+      _errorMessage = 'An unexpected error occurred';
       notifyListeners();
       print('SignIn Error: $e');
     }
     return false;
   }
 
-  Future<void> signOut() async {
-    await _auth.signOut();
-    _user = null;
-    notifyListeners();
-  }
-
-  Future<void> checkAuthState() async {
-    User? currentUser = _auth.currentUser;
-    if (currentUser != null) {
-      DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(currentUser.uid).get();
+  Future<void> _loadUserFromFirestore(String uid) async {
+    try {
+      DocumentSnapshot userDoc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get();
 
       if (userDoc.exists) {
         _user = UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
-        notifyListeners();
       }
+    } catch (e) {
+      print('Error loading user data: $e');
     }
   }
 
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+      _user = null;
+      _errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      print('Sign out error: $e');
+    }
+  }
 
-  void clearError() {
-  _errorMessage = null;
-  notifyListeners();
-}
-
+  Future<void> checkAuthState() async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        await _loadUserFromFirestore(currentUser.uid);
+      }
+    } catch (e) {
+      print('Check auth state error: $e');
+    }
+  }
 }

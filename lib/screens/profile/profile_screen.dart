@@ -1,5 +1,8 @@
 import 'package:agroconnect/screens/admin/admin_login_screen.dart';
 import 'package:agroconnect/screens/feedback/feedback_screen.dart';
+import 'package:agroconnect/screens/profile/about_screen.dart';
+import 'package:agroconnect/screens/profile/help_support_screen.dart';
+import 'package:agroconnect/screens/wishlist/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -188,9 +191,12 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          _buildInfoRow(Icons.phone, 'Phone', auth.user!.phone.isEmpty ? 'Not provided' : auth.user!.phone),
-          _buildInfoRow(Icons.location_on, 'Address', auth.user!.address.isEmpty ? 'Not provided' : auth.user!.address),
-          _buildInfoRow(Icons.calendar_today, 'Member since', _formatDate(auth.user!.createdAt)),
+          _buildInfoRow(Icons.phone, 'Phone',
+              auth.user!.phone.isEmpty ? 'Not provided' : auth.user!.phone),
+          _buildInfoRow(Icons.location_on, 'Address',
+              auth.user!.address.isEmpty ? 'Not provided' : auth.user!.address),
+          _buildInfoRow(Icons.calendar_today, 'Member since',
+              _formatDate(auth.user!.createdAt)),
           SizedBox(height: 16),
           CustomButton(
             text: 'Edit Profile',
@@ -247,19 +253,51 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildMenuItems(BuildContext context, AuthProvider auth) {
   final menuItems = [
-    {'icon': Icons.receipt_long, 'title': 'My Orders', 'subtitle': 'View your order history'},
-    {'icon': Icons.favorite, 'title': 'Wishlist', 'subtitle': 'Your favorite products'},
-    {'icon': Icons.location_on, 'title': 'Addresses', 'subtitle': 'Manage delivery addresses'},
-    {'icon': Icons.payment, 'title': 'Payment Methods', 'subtitle': 'Manage payment options'},
-    {'icon': Icons.notifications, 'title': 'Notifications', 'subtitle': 'Notification preferences'},
-    {'icon': Icons.feedback, 'title': 'Send Feedback', 'subtitle': 'Help us improve the app'},
-    {'icon': Icons.help, 'title': 'Help & Support', 'subtitle': 'Get help and support'},
-    {'icon': Icons.info, 'title': 'About', 'subtitle': 'About Farmer Friends'},
-    // Add admin access
-    {'icon': Icons.admin_panel_settings, 'title': 'Admin Portal', 'subtitle': 'For authorized personnel only'},
+    {
+      'icon': Icons.receipt_long,
+      'title': 'My Orders',
+      'subtitle': 'View your order history',
+      'route': '/orders'
+    },
+    {
+      'icon': Icons.favorite,
+      'title': 'Wishlist',
+      'subtitle': 'Your favorite products',
+      'route': '/wishlist'
+    },
+    {
+      'icon': Icons.location_on,
+      'title': 'Addresses',
+      'subtitle': 'Manage delivery addresses',
+      'route': '/addresses'
+    },
+    {
+      'icon': Icons.payment,
+      'title': 'Payment Methods',
+      'subtitle': 'Manage payment options',
+      'route': '/payment-methods'
+    },
+    {
+      'icon': Icons.notifications,
+      'title': 'Notifications',
+      'subtitle': 'Notification preferences',
+      'route': '/notifications'
+    },
+    {
+      'icon': Icons.help,
+      'title': 'Help & Support',
+      'subtitle': 'Get help and support',
+      'route': '/help-support'
+    },
+    {
+      'icon': Icons.info,
+      'title': 'About',
+      'subtitle': 'About Farmer Friends',
+      'route': '/about'
+    },
   ];
 
-  return Container(
+    return Container(
     margin: EdgeInsets.symmetric(horizontal: 16),
     decoration: BoxDecoration(
       color: Colors.white,
@@ -279,6 +317,7 @@ class ProfileScreen extends StatelessWidget {
           item['icon'] as IconData,
           item['title'] as String,
           item['subtitle'] as String,
+          route: item['route'] as String,
         )).toList(),
         Divider(height: 1),
         _buildMenuItem(
@@ -294,13 +333,14 @@ class ProfileScreen extends StatelessWidget {
   );
 }
 
- Widget _buildMenuItem(
+  Widget _buildMenuItem(
   BuildContext context,
   IconData icon,
   String title,
   String subtitle, {
   bool isLogout = false,
   VoidCallback? onTap,
+  String? route,
 }) {
   return ListTile(
     leading: Container(
@@ -336,23 +376,42 @@ class ProfileScreen extends StatelessWidget {
       color: AppColors.textSecondary,
     ),
     onTap: onTap ?? () {
-      // Handle navigation to different screens
-      if (title == 'My Orders') {
-        DefaultTabController.of(context)?.animateTo(3);
-      } else if (title == 'Send Feedback') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => FeedbackScreen()),
-        );
-      } else if (title == 'Admin Portal') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AdminLoginScreen()),
-        );
-      }
-      // Add other navigation logic here
+      _handleNavigation(context, title, route);
     },
   );
+}
+
+  void _handleNavigation(BuildContext context, String title, String? route) {
+  switch (title) {
+    case 'My Orders':
+      DefaultTabController.of(context)?.animateTo(3);
+      break;
+    case 'Wishlist':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => WishlistScreen()),
+      );
+      break;
+    case 'Help & Support':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HelpSupportScreen()),
+      );
+      break;
+    case 'About':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AboutScreen()),
+      );
+      break;
+    default:
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$title feature coming soon!'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+  }
 }
 
   void _showLogoutDialog(BuildContext context, AuthProvider auth) {

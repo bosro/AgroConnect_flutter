@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+// Remove only this line:
+// import 'package:carousel_slider/carousel_slider.dart';
 import '../../models/product_model.dart';
 import '../../providers/cart_provider.dart';
 import '../../utils/app_colors.dart';
@@ -19,6 +20,13 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _quantity = 1;
   int _currentImageIndex = 0;
+  PageController _pageController = PageController(); // Add this
+
+  @override
+  void dispose() {
+    _pageController.dispose(); // Add this
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,39 +59,65 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       backgroundColor: AppColors.primary,
       flexibleSpace: FlexibleSpaceBar(
         background: widget.product.images.isNotEmpty
-            ? CarouselSlider(
-                items: widget.product.images.map((imageUrl) {
-                  return CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    placeholder: (context, url) => Container(
-                      color: AppColors.background,
-                      child: Icon(
-                        Icons.image,
-                        size: 50,
-                        color: AppColors.textSecondary,
+            ? Stack( // Replace CarouselSlider with Stack + PageView
+                children: [
+                  PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentImageIndex = index;
+                      });
+                    },
+                    itemCount: widget.product.images.length,
+                    itemBuilder: (context, index) {
+                      return CachedNetworkImage(
+                        imageUrl: widget.product.images[index],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: 300,
+                        placeholder: (context, url) => Container(
+                          color: AppColors.background,
+                          child: Icon(
+                            Icons.image,
+                            size: 50,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: AppColors.background,
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  // Add page indicator dots
+                  if (widget.product.images.length > 1)
+                    Positioned(
+                      bottom: 16,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: widget.product.images.asMap().entries.map((entry) {
+                          return Container(
+                            width: 8,
+                            height: 8,
+                            margin: EdgeInsets.symmetric(horizontal: 2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentImageIndex == entry.key
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.5),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
-                    errorWidget: (context, url, error) => Container(
-                      color: AppColors.background,
-                      child: Icon(
-                        Icons.broken_image,
-                        size: 50,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  );
-                }).toList(),
-                options: CarouselOptions(
-                  height: 300,
-                  viewportFraction: 1.0,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _currentImageIndex = index;
-                    });
-                  },
-                ),
+                ],
               )
             : Container(
                 color: AppColors.background,
@@ -111,6 +145,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  // Keep all other methods exactly the same
   Widget _buildProductInfo() {
     return Container(
       padding: EdgeInsets.all(20),

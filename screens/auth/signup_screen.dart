@@ -94,7 +94,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'Join AgroConnect',
+                  "Join Farmer's Friend",
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,

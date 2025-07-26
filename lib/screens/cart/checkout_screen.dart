@@ -96,27 +96,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           ),
           SizedBox(height: 16),
-          ...cart.items.map((item) => Padding(
-            padding: EdgeInsets.only(bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    '${item.productName} x${item.quantity}',
-                    style: TextStyle(color: AppColors.textSecondary),
-                  ),
-                ),
-                Text(
-                  '\$${item.totalPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          )).toList(),
+          ...cart.items
+              .map((item) => Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${item.productName} x${item.quantity}',
+                            style: TextStyle(color: AppColors.textSecondary),
+                          ),
+                        ),
+                        Text(
+                          '\$${item.totalPrice.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ))
+              .toList(),
         ],
       ),
     );
@@ -180,17 +182,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           ),
           SizedBox(height: 16),
-          ..._paymentMethods.map((method) => RadioListTile<String>(
-            title: Text(method),
-            value: method,
-            groupValue: _selectedPaymentMethod,
-            onChanged: (value) {
-              setState(() {
-                _selectedPaymentMethod = value!;
-              });
-            },
-            activeColor: AppColors.primary,
-          )).toList(),
+          ..._paymentMethods
+              .map((method) => RadioListTile<String>(
+                    title: Text(method),
+                    value: method,
+                    groupValue: _selectedPaymentMethod,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedPaymentMethod = value!;
+                      });
+                    },
+                    activeColor: AppColors.primary,
+                  ))
+              .toList(),
         ],
       ),
     );
@@ -243,7 +247,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Subtotal'),
-              Text('\$${subtotal.toStringAsFixed(2)}'),
+              Text('GH¢${subtotal.toStringAsFixed(2)}'), // Changed from \$
             ],
           ),
           SizedBox(height: 8),
@@ -251,7 +255,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Delivery Fee'),
-              Text('\$${deliveryFee.toStringAsFixed(2)}'),
+              Text('GH¢${deliveryFee.toStringAsFixed(2)}'), // Changed from \$
             ],
           ),
           Divider(),
@@ -267,7 +271,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               Text(
-                '\$${total.toStringAsFixed(2)}',
+                'GH¢${total.toStringAsFixed(2)}', // Changed from \$
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -281,7 +285,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  void _showPaymentNotAvailableDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Payment Method Not Available'),
+        content: Text(
+          'This payment method is not available yet but will be coming soon! Please select "Cash on Delivery" for now.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                _selectedPaymentMethod = 'Cash on Delivery';
+              });
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _placeOrder(CartProvider cart, AuthProvider auth) async {
+    // Validate inputs
     if (_addressController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -299,6 +327,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           backgroundColor: AppColors.error,
         ),
       );
+      return;
+    }
+
+    // Check if payment method is available
+    if (_selectedPaymentMethod != 'Cash on Delivery') {
+      _showPaymentNotAvailableDialog();
       return;
     }
 
@@ -320,6 +354,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         deliveryAddress: _addressController.text.trim(),
         paymentMethod: _selectedPaymentMethod,
         createdAt: DateTime.now(),
+        // Add phone number to notes or create a separate field
       );
 
       await FirebaseFirestore.instance
@@ -327,24 +362,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           .doc(orderId)
           .set(order.toMap());
 
+      // Clear cart after successful order
       cart.clearCart();
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => OrderSuccessScreen(order: order),
-        ),
-      );
+      // Navigate to success screen
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => OrderSuccessScreen(order: order),
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to place order. Please try again.'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      print('Error placing order: $e'); // Debug print
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to place order: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 }

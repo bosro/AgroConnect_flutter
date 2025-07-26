@@ -134,7 +134,7 @@ class OrdersScreen extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              '${order.items.length} items • \$${order.totalAmount.toStringAsFixed(2)}',
+              '${order.items.length} items • \u20B5${order.totalAmount.toStringAsFixed(2)}',
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,

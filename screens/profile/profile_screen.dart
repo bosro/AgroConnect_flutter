@@ -1,3 +1,8 @@
+import 'package:agroconnect/screens/admin/admin_login_screen.dart';
+import 'package:agroconnect/screens/feedback/feedback_screen.dart';
+import 'package:agroconnect/screens/profile/about_screen.dart';
+import 'package:agroconnect/screens/profile/help_support_screen.dart';
+import 'package:agroconnect/screens/wishlist/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -186,9 +191,12 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          _buildInfoRow(Icons.phone, 'Phone', auth.user!.phone.isEmpty ? 'Not provided' : auth.user!.phone),
-          _buildInfoRow(Icons.location_on, 'Address', auth.user!.address.isEmpty ? 'Not provided' : auth.user!.address),
-          _buildInfoRow(Icons.calendar_today, 'Member since', _formatDate(auth.user!.createdAt)),
+          _buildInfoRow(Icons.phone, 'Phone',
+              auth.user!.phone.isEmpty ? 'Not provided' : auth.user!.phone),
+          _buildInfoRow(Icons.location_on, 'Address',
+              auth.user!.address.isEmpty ? 'Not provided' : auth.user!.address),
+          _buildInfoRow(Icons.calendar_today, 'Member since',
+              _formatDate(auth.user!.createdAt)),
           SizedBox(height: 16),
           CustomButton(
             text: 'Edit Profile',
@@ -244,101 +252,167 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildMenuItems(BuildContext context, AuthProvider auth) {
-    final menuItems = [
-      {'icon': Icons.receipt_long, 'title': 'My Orders', 'subtitle': 'View your order history'},
-      {'icon': Icons.favorite, 'title': 'Wishlist', 'subtitle': 'Your favorite products'},
-      {'icon': Icons.location_on, 'title': 'Addresses', 'subtitle': 'Manage delivery addresses'},
-      {'icon': Icons.payment, 'title': 'Payment Methods', 'subtitle': 'Manage payment options'},
-      {'icon': Icons.notifications, 'title': 'Notifications', 'subtitle': 'Notification preferences'},
-      {'icon': Icons.help, 'title': 'Help & Support', 'subtitle': 'Get help and support'},
-      {'icon': Icons.info, 'title': 'About', 'subtitle': 'About AgroConnect'},
-    ];
+  final menuItems = [
+    {
+      'icon': Icons.receipt_long,
+      'title': 'My Orders',
+      'subtitle': 'View your order history',
+      'route': '/orders'
+    },
+    {
+      'icon': Icons.favorite,
+      'title': 'Wishlist',
+      'subtitle': 'Your favorite products',
+      'route': '/wishlist'
+    },
+    {
+      'icon': Icons.location_on,
+      'title': 'Addresses',
+      'subtitle': 'Manage delivery addresses',
+      'route': '/addresses'
+    },
+    {
+      'icon': Icons.payment,
+      'title': 'Payment Methods',
+      'subtitle': 'Manage payment options',
+      'route': '/payment-methods'
+    },
+    {
+      'icon': Icons.notifications,
+      'title': 'Notifications',
+      'subtitle': 'Notification preferences',
+      'route': '/notifications'
+    },
+    {
+      'icon': Icons.help,
+      'title': 'Help & Support',
+      'subtitle': 'Get help and support',
+      'route': '/help-support'
+    },
+    {
+      'icon': Icons.info,
+      'title': 'About',
+      'subtitle': 'About Farmer Friends',
+      'route': '/about'
+    },
+  ];
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          ...menuItems.map((item) => _buildMenuItem(
-            context,
-            item['icon'] as IconData,
-            item['title'] as String,
-            item['subtitle'] as String,
-          )).toList(),
-          Divider(height: 1),
-          _buildMenuItem(
-            context,
-            Icons.logout,
-            'Logout',
-            'Sign out of your account',
-            isLogout: true,
-            onTap: () => _showLogoutDialog(context, auth),
-          ),
-        ],
-      ),
-    );
-  }
+    margin: EdgeInsets.symmetric(horizontal: 16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.1),
+          blurRadius: 10,
+          offset: Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Column(
+      children: [
+        ...menuItems.map((item) => _buildMenuItem(
+          context,
+          item['icon'] as IconData,
+          item['title'] as String,
+          item['subtitle'] as String,
+          route: item['route'] as String,
+        )).toList(),
+        Divider(height: 1),
+        _buildMenuItem(
+          context,
+          Icons.logout,
+          'Logout',
+          'Sign out of your account',
+          isLogout: true,
+          onTap: () => _showLogoutDialog(context, auth),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildMenuItem(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String subtitle, {
-    bool isLogout = false,
-    VoidCallback? onTap,
-  }) {
-    return ListTile(
-      leading: Container(
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: (isLogout ? AppColors.error : AppColors.primary).withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          color: isLogout ? AppColors.error : AppColors.primary,
-          size: 20,
-        ),
+  BuildContext context,
+  IconData icon,
+  String title,
+  String subtitle, {
+  bool isLogout = false,
+  VoidCallback? onTap,
+  String? route,
+}) {
+  return ListTile(
+    leading: Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: (isLogout ? AppColors.error : AppColors.primary).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: isLogout ? AppColors.error : AppColors.textPrimary,
-        ),
+      child: Icon(
+        icon,
+        color: isLogout ? AppColors.error : AppColors.primary,
+        size: 20,
       ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          fontSize: 12,
-          color: AppColors.textSecondary,
-        ),
+    ),
+    title: Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: isLogout ? AppColors.error : AppColors.textPrimary,
       ),
-      trailing: Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
+    ),
+    subtitle: Text(
+      subtitle,
+      style: TextStyle(
+        fontSize: 12,
         color: AppColors.textSecondary,
       ),
-      onTap: onTap ?? () {
-        // Handle navigation to different screens
-        if (title == 'My Orders') {
-          DefaultTabController.of(context)?.animateTo(3);
-        }
-        // Add other navigation logic here
-      },
-    );
+    ),
+    trailing: Icon(
+      Icons.arrow_forward_ios,
+      size: 16,
+      color: AppColors.textSecondary,
+    ),
+    onTap: onTap ?? () {
+      _handleNavigation(context, title, route);
+    },
+  );
+}
+
+  void _handleNavigation(BuildContext context, String title, String? route) {
+  switch (title) {
+    case 'My Orders':
+      DefaultTabController.of(context)?.animateTo(3);
+      break;
+    case 'Wishlist':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => WishlistScreen()),
+      );
+      break;
+    case 'Help & Support':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HelpSupportScreen()),
+      );
+      break;
+    case 'About':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AboutScreen()),
+      );
+      break;
+    default:
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$title feature coming soon!'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
   }
+}
 
   void _showLogoutDialog(BuildContext context, AuthProvider auth) {
     showDialog(

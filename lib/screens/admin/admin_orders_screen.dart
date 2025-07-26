@@ -16,7 +16,12 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   String _searchQuery = '';
 
   final List<String> _statusFilters = [
-    'All', 'Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'
+    'All',
+    'Pending',
+    'Confirmed',
+    'Shipped',
+    'Delivered',
+    'Cancelled'
   ];
 
   @override
@@ -39,7 +44,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              Provider.of<AdminProvider>(context, listen: false).loadAllOrders();
+              Provider.of<AdminProvider>(context, listen: false)
+                  .loadAllOrders();
             },
           ),
         ],
@@ -81,20 +87,22 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: _statusFilters.map((status) => Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: FilterChip(
-                  label: Text(status),
-                  selected: _selectedStatus == status,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedStatus = status;
-                    });
-                  },
-                  selectedColor: AppColors.primary.withOpacity(0.2),
-                  checkmarkColor: AppColors.primary,
-                ),
-              )).toList(),
+              children: _statusFilters
+                  .map((status) => Padding(
+                        padding: EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          label: Text(status),
+                          selected: _selectedStatus == status,
+                          onSelected: (selected) {
+                            setState(() {
+                              _selectedStatus = status;
+                            });
+                          },
+                          selectedColor: AppColors.primary.withOpacity(0.2),
+                          checkmarkColor: AppColors.primary,
+                        ),
+                      ))
+                  .toList(),
             ),
           ),
         ],
@@ -106,20 +114,31 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     return Consumer<AdminProvider>(
       builder: (context, adminProvider, child) {
         final orders = adminProvider.orders;
-        final pendingCount = orders.where((o) => o.status == OrderStatus.pending).length;
-        final confirmedCount = orders.where((o) => o.status == OrderStatus.confirmed).length;
-        final shippedCount = orders.where((o) => o.status == OrderStatus.shipped).length;
-        final deliveredCount = orders.where((o) => o.status == OrderStatus.delivered).length;
+        final pendingCount =
+            orders.where((o) => o.status == OrderStatus.pending).length;
+        final confirmedCount =
+            orders.where((o) => o.status == OrderStatus.confirmed).length;
+        final shippedCount =
+            orders.where((o) => o.status == OrderStatus.shipped).length;
+        final deliveredCount =
+            orders.where((o) => o.status == OrderStatus.delivered).length;
 
         return Container(
           padding: EdgeInsets.all(16),
           color: Colors.white,
           child: Row(
             children: [
-              Expanded(child: _buildStatCard('Pending', pendingCount, AppColors.warning)),
-              Expanded(child: _buildStatCard('Confirmed', confirmedCount, AppColors.primary)),
-              Expanded(child: _buildStatCard('Shipped', shippedCount, Colors.blue)),
-              Expanded(child: _buildStatCard('Delivered', deliveredCount, AppColors.success)),
+              Expanded(
+                  child: _buildStatCard(
+                      'Pending', pendingCount, AppColors.warning)),
+              Expanded(
+                  child: _buildStatCard(
+                      'Confirmed', confirmedCount, AppColors.primary)),
+              Expanded(
+                  child: _buildStatCard('Shipped', shippedCount, Colors.blue)),
+              Expanded(
+                  child: _buildStatCard(
+                      'Delivered', deliveredCount, AppColors.success)),
             ],
           ),
         );
@@ -170,11 +189,14 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         var filteredOrders = adminProvider.orders.where((order) {
           bool matchesSearch = _searchQuery.isEmpty ||
               order.id.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              order.deliveryAddress.toLowerCase().contains(_searchQuery.toLowerCase());
-          
+              order.deliveryAddress
+                  .toLowerCase()
+                  .contains(_searchQuery.toLowerCase());
+
           bool matchesStatus = _selectedStatus == 'All' ||
-              order.status.toString().split('.').last.toLowerCase() == _selectedStatus.toLowerCase();
-          
+              order.status.toString().split('.').last.toLowerCase() ==
+                  _selectedStatus.toLowerCase();
+
           return matchesSearch && matchesStatus;
         }).toList();
 
@@ -324,23 +346,30 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     Row(
                       children: [
                         TextButton(
-                          onPressed: () => _updateOrderStatus(order, OrderStatus.confirmed, adminProvider),
-                          child: Text('Confirm', style: TextStyle(fontSize: 12)),
+                          onPressed: () => _updateOrderStatus(
+                              order, OrderStatus.confirmed, adminProvider),
+                          child:
+                              Text('Confirm', style: TextStyle(fontSize: 12)),
                         ),
                         TextButton(
-                          onPressed: () => _updateOrderStatus(order, OrderStatus.cancelled, adminProvider),
-                          child: Text('Cancel', style: TextStyle(fontSize: 12, color: AppColors.error)),
+                          onPressed: () => _updateOrderStatus(
+                              order, OrderStatus.cancelled, adminProvider),
+                          child: Text('Cancel',
+                              style: TextStyle(
+                                  fontSize: 12, color: AppColors.error)),
                         ),
                       ],
                     ),
                   if (order.status == OrderStatus.confirmed)
                     TextButton(
-                      onPressed: () => _updateOrderStatus(order, OrderStatus.shipped, adminProvider),
+                      onPressed: () => _updateOrderStatus(
+                          order, OrderStatus.shipped, adminProvider),
                       child: Text('Ship', style: TextStyle(fontSize: 12)),
                     ),
                   if (order.status == OrderStatus.shipped)
                     TextButton(
-                      onPressed: () => _updateOrderStatus(order, OrderStatus.delivered, adminProvider),
+                      onPressed: () => _updateOrderStatus(
+                          order, OrderStatus.delivered, adminProvider),
                       child: Text('Deliver', style: TextStyle(fontSize: 12)),
                     ),
                 ],
@@ -407,24 +436,77 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   }
 
   Future<void> _updateOrderStatus(OrderModel order, OrderStatus newStatus, AdminProvider adminProvider) async {
-    final success = await adminProvider.updateOrderStatus(order.id, newStatus);
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Order status updated to ${newStatus.toString().split('.').last}'),
-          backgroundColor: AppColors.success,
+  // Show loading dialog with notification info
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text('Updating order status...'),
+          SizedBox(height: 8),
+          Text(
+            'Customer will be notified via push notification',
+            style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  final success = await adminProvider.updateOrderStatus(order.id, newStatus);
+  
+  // Close loading dialog
+  Navigator.pop(context);
+  
+  if (success) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white, size: 20),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Order updated successfully! 🎉',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    'Customer has been notified',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update order status'),
-          backgroundColor: AppColors.error,
+        backgroundColor: AppColors.success,
+        duration: Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 8),
+            Text('Failed to update order status'),
+          ],
         ),
-      );
-    }
+        backgroundColor: AppColors.error,
+      ),
+    );
   }
+}
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';

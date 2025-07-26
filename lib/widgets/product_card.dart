@@ -3,6 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import '../models/product_model.dart';
 import '../providers/cart_provider.dart';
+import '../providers/wishlist_provider.dart';
+import '../providers/auth_provider.dart';
 import '../utils/app_colors.dart';
 import '../screens/products/product_detail_screen.dart';
 
@@ -41,8 +43,7 @@ class ProductCard extends StatelessWidget {
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(16)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                     child: Container(
                       width: double.infinity,
                       child: product.images.isNotEmpty
@@ -78,8 +79,7 @@ class ProductCard extends StatelessWidget {
                       top: 8,
                       left: 8,
                       child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: AppColors.success,
                           borderRadius: BorderRadius.circular(8),
@@ -94,20 +94,59 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                  // Wishlist Button
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Icon(
-                        Icons.favorite_border,
-                        size: 16,
-                        color: AppColors.textSecondary,
-                      ),
+                    child: Consumer2<WishlistProvider, AuthProvider>(
+                      builder: (context, wishlist, auth, child) {
+                        final isInWishlist = wishlist.isInWishlist(product.id);
+                        
+                        return GestureDetector(
+                          onTap: () {
+                            if (auth.user != null) {
+                              wishlist.toggleWishlist(product, auth.user!.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    isInWishlist 
+                                        ? 'Removed from wishlist' 
+                                        : 'Added to wishlist'
+                                  ),
+                                  backgroundColor: AppColors.success,
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Please login to add to wishlist'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isInWishlist ? Icons.favorite : Icons.favorite_border,
+                              size: 16,
+                              color: isInWishlist ? AppColors.error : AppColors.textSecondary,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -167,16 +206,16 @@ class ProductCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          'GH₵${product.price.toStringAsFixed(2)}/${product.unit}', // Changed from \$ to GH₵
+                          'GH₵${product.price.toStringAsFixed(2)}/${product.unit}',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
                           ),
-                          overflow: TextOverflow.ellipsis, // Add this
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 8), // Add spacing
+                      SizedBox(width: 8),
                       GestureDetector(
                         onTap: () {
                           Provider.of<CartProvider>(context, listen: false)

@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'AgroConnect',
+                  "Farmer's Friend",
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
