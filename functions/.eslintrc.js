@@ -13,7 +13,7 @@ module.exports = {
   rules: {
     "no-restricted-globals": ["error", "name", "length"],
     "prefer-arrow-callback": "error",
-    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
+    "quotes": ["error", "double", { "allowTemplateLiterals": true }],
   },
   overrides: [
     {
@@ -21,7 +21,18 @@ module.exports = {
       env: {
         mocha: true,
       },
-      rules: {},
+      rules: {
+        "quotes": "off",
+        "indent": "off",
+        "max-len": "off",
+        "require-jsdoc": "off",
+        "object-curly-spacing": "off",
+        "no-trailing-spaces": "off",
+        "eol-last": "off",
+        "arrow-parens": "off",
+        "padded-blocks": "off",
+        "no-unused-vars": "warn",
+      },
     },
   ],
   globals: {},
