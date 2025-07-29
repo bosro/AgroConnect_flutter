@@ -1,3 +1,4 @@
+// Update your OrdersScreen
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,6 +26,8 @@ class OrdersScreen extends StatelessWidget {
             );
           }
 
+          print('🔍 Current User ID: ${auth.user!.id}'); // Debug line
+
           return StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('orders')
@@ -32,17 +35,75 @@ class OrdersScreen extends StatelessWidget {
                 .orderBy('createdAt', descending: true)
                 .snapshots(),
             builder: (context, snapshot) {
+              print('🔍 Stream connection state: ${snapshot.connectionState}'); // Debug line
+              
+              if (snapshot.hasError) {
+                print('🔍 Stream error: ${snapshot.error}'); // Debug line
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error, size: 64, color: AppColors.error),
+                      SizedBox(height: 16),
+                      Text('Error loading orders: ${snapshot.error}'),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Force refresh
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => OrdersScreen()),
+                          );
+                        },
+                        child: Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
               }
 
+              print('🔍 Documents found: ${snapshot.data?.docs.length ?? 0}'); // Debug line
+              
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return _buildEmptyOrders();
+                // Let's also check if there are ANY orders in the collection
+                return FutureBuilder<QuerySnapshot>(
+                  future: FirebaseFirestore.instance.collection('orders').limit(5).get(),
+                  builder: (context, allOrdersSnapshot) {
+                    if (allOrdersSnapshot.hasData) {
+                      print('🔍 Total orders in collection: ${allOrdersSnapshot.data!.docs.length}');
+                      if (allOrdersSnapshot.data!.docs.isNotEmpty) {
+                        final firstOrder = allOrdersSnapshot.data!.docs.first.data() as Map<String, dynamic>;
+                        print('🔍 Sample order userId: ${firstOrder['userId']}');
+                        print('🔍 Current user ID: ${auth.user!.id}');
+                      }
+                    }
+                    return _buildEmptyOrders();
+                  },
+                );
               }
 
               final orders = snapshot.data!.docs
-                  .map((doc) => OrderModel.fromMap(doc.data() as Map<String, dynamic>))
+                  .map((doc) {
+                    try {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return OrderModel.fromMap(data);
+                    } catch (e) {
+                      print('🔍 Error parsing order: $e');
+                      return null;
+                    }
+                  })
+                  .where((order) => order != null)
+                  .cast<OrderModel>()
                   .toList();
+
+              print('🔍 Successfully parsed orders: ${orders.length}'); // Debug line
+
+              if (orders.isEmpty) {
+                return _buildEmptyOrders();
+              }
 
               return ListView.builder(
                 padding: EdgeInsets.all(16),
@@ -59,6 +120,7 @@ class OrdersScreen extends StatelessWidget {
     );
   }
 
+  // Rest of your methods remain the same...
   Widget _buildEmptyOrders() {
     return Center(
       child: Column(
@@ -134,7 +196,7 @@ class OrdersScreen extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              '${order.items.length} items • \u20B5${order.totalAmount.toStringAsFixed(2)}',
+              '${order.items.length} items • ¢${order.totalAmount.toStringAsFixed(2)}',
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,

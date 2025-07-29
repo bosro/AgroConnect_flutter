@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(width: 4),
                   Text(
-                    'Yogyakarta, Indonesia',
+                    'Accra, Ghana',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -188,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           SizedBox(height: 4),
           Text(
-            'Your trusted partner in agriculture',
+            'Your trusted animal feed plug',
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 14,

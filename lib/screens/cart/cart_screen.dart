@@ -318,7 +318,7 @@ class CartScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                 ),
                 Text(
-                  'GH₵${deliveryFee.toStringAsFixed(2)}',
+                  'GH¢${deliveryFee.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                 ),
               ],

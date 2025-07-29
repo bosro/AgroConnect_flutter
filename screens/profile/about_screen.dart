@@ -73,7 +73,7 @@ class AboutScreen extends StatelessWidget {
             SizedBox(height: 32),
             Center(
               child: Text(
-                '© 2024 Farmer Friends. All rights reserved.',
+                '© 2025 Farmer Friends. All rights reserved.',
                 style: TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,

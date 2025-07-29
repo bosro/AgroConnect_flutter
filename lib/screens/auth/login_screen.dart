@@ -1,3 +1,4 @@
+import 'package:agroconnect/screens/admin/admin_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -28,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      
+
       bool success = await authProvider.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
@@ -86,8 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 8),
-               Text(
-                  'Your Agricultural Partner in Madina',
+                Text(
+                  'Your Animal Feed Plug',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white.withOpacity(0.8),
@@ -146,7 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefixIcon: Icons.lock,
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                              _obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                             ),
                             onPressed: () {
                               setState(() {
@@ -171,6 +174,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             );
                           },
                         ),
+                        // Add this to your LoginScreen build method, after the login button:
+
                         SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -197,6 +202,31 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ],
+                        ),
+                        SizedBox(height: 24),
+// Add this section for admin access
+                        Container(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AdminLoginScreen(),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.admin_panel_settings, size: 20),
+                            label: Text('Admin Login'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primary,
+                              side: BorderSide(color: AppColors.primary),
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),

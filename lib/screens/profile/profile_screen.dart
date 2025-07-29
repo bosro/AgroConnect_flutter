@@ -1,5 +1,6 @@
 import 'package:agroconnect/screens/admin/admin_login_screen.dart';
 import 'package:agroconnect/screens/feedback/feedback_screen.dart';
+import 'package:agroconnect/screens/main_screen.dart';
 import 'package:agroconnect/screens/profile/about_screen.dart';
 import 'package:agroconnect/screens/profile/help_support_screen.dart';
 import 'package:agroconnect/screens/wishlist/wishlist_screen.dart';
@@ -265,24 +266,24 @@ class ProfileScreen extends StatelessWidget {
       'subtitle': 'Your favorite products',
       'route': '/wishlist'
     },
-    {
-      'icon': Icons.location_on,
-      'title': 'Addresses',
-      'subtitle': 'Manage delivery addresses',
-      'route': '/addresses'
-    },
+    // {
+    //   'icon': Icons.location_on,
+    //   'title': 'Addresses',
+    //   'subtitle': 'Manage delivery addresses',
+    //   'route': '/addresses'
+    // },
     {
       'icon': Icons.payment,
       'title': 'Payment Methods',
       'subtitle': 'Manage payment options',
       'route': '/payment-methods'
     },
-    {
-      'icon': Icons.notifications,
-      'title': 'Notifications',
-      'subtitle': 'Notification preferences',
-      'route': '/notifications'
-    },
+    // {
+    //   'icon': Icons.notifications,
+    //   'title': 'Notifications',
+    //   'subtitle': 'Notification preferences',
+    //   'route': '/notifications'
+    // },
     {
       'icon': Icons.help,
       'title': 'Help & Support',
@@ -384,7 +385,16 @@ class ProfileScreen extends StatelessWidget {
   void _handleNavigation(BuildContext context, String title, String? route) {
   switch (title) {
     case 'My Orders':
-      DefaultTabController.of(context)?.animateTo(3);
+      // Find the MainScreen and navigate to orders tab
+      final navigator = Navigator.of(context);
+      
+      // Pop current route and navigate to main with orders tab
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => MainScreenWithTab(initialIndex: 3),
+        ),
+        (route) => false,
+      );
       break;
     case 'Wishlist':
       Navigator.push(
