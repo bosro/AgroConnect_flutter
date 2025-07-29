@@ -119,7 +119,7 @@ class _SplashScreenState extends State<SplashScreen>
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: Text(
-                  'Farmer's Friend',
+                  "Farmer's Friend",
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

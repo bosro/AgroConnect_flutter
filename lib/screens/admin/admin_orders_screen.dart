@@ -280,7 +280,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   ),
                   SizedBox(width: 4),
                   Text(
-                    'GH₵${order.totalAmount.toStringAsFixed(2)}',
+                    'GH¢${order.totalAmount.toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

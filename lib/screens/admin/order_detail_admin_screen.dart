@@ -231,7 +231,7 @@ class OrderDetailAdminScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'GH₵${item.price.toStringAsFixed(2)}/${item.unit}',
+                        'GH¢${item.price.toStringAsFixed(2)}/${item.unit}',
                         style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -250,7 +250,7 @@ class OrderDetailAdminScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'GH₵${item.totalPrice.toStringAsFixed(2)}',
+                  'GH¢${item.totalPrice.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -432,7 +432,7 @@ class OrderDetailAdminScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Subtotal'),
-              Text('GH₵${subtotal.toStringAsFixed(2)}'),
+              Text('GH¢${subtotal.toStringAsFixed(2)}'),
             ],
           ),
           SizedBox(height: 8),
@@ -440,7 +440,7 @@ class OrderDetailAdminScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Delivery Fee'),
-              Text('GH₵${deliveryFee.toStringAsFixed(2)}'),
+              Text('GH¢${deliveryFee.toStringAsFixed(2)}'),
             ],
           ),
           Divider(),
@@ -456,7 +456,7 @@ class OrderDetailAdminScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'GH₵${order.totalAmount.toStringAsFixed(2)}',
+                'GH¢${order.totalAmount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

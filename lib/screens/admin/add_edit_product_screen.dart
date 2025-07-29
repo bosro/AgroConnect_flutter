@@ -297,7 +297,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
               Expanded(
                 child: CustomTextField(
                   controller: _priceController,
-                  label: 'Price (GH₵)',
+                  label: 'Price (GH¢)',
                   hint: '0.00',
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {

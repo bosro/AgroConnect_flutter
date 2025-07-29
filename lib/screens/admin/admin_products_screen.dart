@@ -186,7 +186,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                         ),
                       ),
                       Text(
-                        'GH₵${product.price.toStringAsFixed(2)}/${product.unit}',
+                        'GH¢${product.price.toStringAsFixed(2)}/${product.unit}',
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.primary,

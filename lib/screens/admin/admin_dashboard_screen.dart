@@ -135,7 +135,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       children: [
         _buildAnalyticsCard(
           'Total Revenue',
-          'GH₵${(analytics['totalRevenue'] ?? 0).toStringAsFixed(2)}',
+          'GH¢${(analytics['totalRevenue'] ?? 0).toStringAsFixed(2)}',
           Icons.attach_money,
           AppColors.success,
         ),
@@ -318,7 +318,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 ),
                               ),
                               Text(
-                                'GH₵${order.totalAmount.toStringAsFixed(2)}',
+                                'GH¢${order.totalAmount.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   color: AppColors.textSecondary,
                                 ),
